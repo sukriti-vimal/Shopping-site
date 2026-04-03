@@ -16,9 +16,16 @@ function getNewProduct(req, res) {
 }
 
 async function createNewProduct(req, res, next) {
+  // Cloudinary stores full URL in req.file.path
+  const image = req.file ? req.file.path : null;
+
+  if (!image) {
+    return next(new Error('Image upload failed. Please try again.'));
+  }
+
   const product = new Product({
     ...req.body,
-    image: req.file.filename,
+    image: image,
   });
 
   try {
@@ -47,7 +54,8 @@ async function updateProduct(req, res, next) {
   });
 
   if (req.file) {
-    product.replaceImage(req.file.filename);
+    // Cloudinary stores full URL in req.file.path
+    product.replaceImage(req.file.path);
   }
 
   try {
@@ -89,11 +97,8 @@ async function updateOrder(req, res, next) {
 
   try {
     const order = await Order.findById(orderId);
-
     order.status = newStatus;
-
     await order.save();
-
     res.json({ message: 'Order updated', newStatus: newStatus });
   } catch (error) {
     next(error);
