@@ -61,10 +61,10 @@ class Product {
     });
   }
 
-  updateImageData() {
-    this.imagePath = `product-data/images/${this.image}`;
-    this.imageUrl = `/products/assets/images/${this.image}`;
-  }
+ updateImageData() {
+  this.imagePath = this.image;
+  this.imageUrl = this.image; 
+}
 
   async save() {
     const productData = {
