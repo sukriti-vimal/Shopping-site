@@ -8,7 +8,7 @@ class Product {
     this.summary = productData.summary;
     this.price = +productData.price;
     this.description = productData.description;
-    this.image = productData.image; // the name of the image file
+    this.image = productData.image;
     this.updateImageData();
     if (productData._id) {
       this.id = productData._id.toString();
@@ -48,8 +48,8 @@ class Product {
   static async findMultiple(ids) {
     const productIds = ids.map(function(id) {
       return new mongodb.ObjectId(id);
-    })
-    
+    });
+
     const products = await db
       .getDb()
       .collection('products')
@@ -61,10 +61,17 @@ class Product {
     });
   }
 
- updateImageData() {
-  this.imagePath = this.image;
-  this.imageUrl = this.image; 
-}
+  updateImageData() {
+    // If image is a full Cloudinary URL, use it directly
+    // Otherwise fall back to local path (for local development)
+    if (this.image && this.image.startsWith('http')) {
+      this.imagePath = this.image;
+      this.imageUrl = this.image;
+    } else {
+      this.imagePath = `product-data/images/${this.image}`;
+      this.imageUrl = `/products/assets/images/${this.image}`;
+    }
+  }
 
   async save() {
     const productData = {
